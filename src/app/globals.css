@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #F9593B;
+  --color-primary-dark: #DF3A1C;
+  --color-primary-light: #FFB493;
+  --color-primary-50: #FFF0EB;
+  --color-accent: #815ED5;
+  --color-accent-dark: #6A45C4;
+  --color-navy: #0C1B2A;
+  --color-navy-light: #132D46;
+  --color-dark: #1F2723;
+  --color-gray: #535353;
+  --color-light: #F3F4F5;
+  --color-light-warm: #FDF5F0;
+  --color-border: #DDDDDD;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--color-dark);
+  font-family: var(--font-sans);
+}
+
+/* Decorative blobs for about section */
+.blob-1 {
+  position: absolute;
+  width: 300px;
+  height: 400px;
+  background: var(--color-primary-50);
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  opacity: 0.5;
+}
+
+.blob-2 {
+  position: absolute;
+  width: 250px;
+  height: 350px;
+  background: var(--color-primary-50);
+  border-radius: 40% 60% 70% 30% / 40% 70% 30% 60%;
+  opacity: 0.4;
+}
+
+/* Wavy decorative lines for testimonials */
+.wavy-line {
+  position: absolute;
+  width: 200px;
+  height: 100px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: rotate(-15deg);
+}
