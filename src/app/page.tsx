@@ -586,7 +586,7 @@ function Testimonials() {
             <StarburstBadge text="" className="w-12 h-12" />
             <span className="text-4xl font-black text-white">4.9</span>
             <span className="text-white/60 text-sm">
-              Out of <span className="text-primary font-bold">300</span> Reviews
+              Out of <span className="text-primary font-bold">1,000+</span> Reviews
             </span>
           </div>
           <div className="mt-6 sm:mt-0 text-right">
@@ -610,22 +610,94 @@ function Testimonials() {
 }
 
 /* =============================================
-   Contact / CTA Form Section
+   Helper: generate available time slots
+   ============================================= */
+function getTimeSlots() {
+  const slots: string[] = [];
+  for (let h = 8; h <= 17; h++) {
+    const hour = h > 12 ? h - 12 : h;
+    const ampm = h >= 12 ? "PM" : "AM";
+    const value = `${h.toString().padStart(2, "0")}:00`;
+    slots.push(value);
+    // label is for display but we store the 24h value
+    void `${hour}:00 ${ampm}`;
+  }
+  return slots;
+}
+
+function formatTimeLabel(value: string) {
+  const h = parseInt(value.split(":")[0]);
+  const hour = h > 12 ? h - 12 : h === 0 ? 12 : h;
+  const ampm = h >= 12 ? "PM" : "AM";
+  return `${hour}:00 ${ampm}`;
+}
+
+function getMinDate() {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  return d.toISOString().split("T")[0];
+}
+
+/* =============================================
+   Calendar Icon
+   ============================================= */
+function CalendarIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </svg>
+  );
+}
+
+/* =============================================
+   Contact / Booking Form Section
    ============================================= */
 function ContactForm() {
   const [formData, setFormData] = useState({
     name: "",
     address: "",
     phone: "",
+    date: "",
+    time: "",
   });
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const timeSlots = getTimeSlots();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
-    setFormData({ name: "", address: "", phone: "" });
+    setStatus("loading");
+    setErrorMsg("");
+
+    try {
+      const res = await fetch("/api/book", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Something went wrong");
+      }
+
+      setStatus("success");
+      setFormData({ name: "", address: "", phone: "", date: "", time: "" });
+      setTimeout(() => setStatus("idle"), 5000);
+    } catch (err) {
+      setStatus("error");
+      setErrorMsg(err instanceof Error ? err.message : "Failed to book. Please try again.");
+      setTimeout(() => setStatus("idle"), 5000);
+    }
   };
+
+  const inputClass =
+    "w-full px-5 py-4 bg-navy text-white placeholder-white/50 rounded-lg border-none outline-none focus:ring-2 focus:ring-primary transition-all";
 
   return (
     <section id="contact" className="relative overflow-hidden">
@@ -644,20 +716,29 @@ function ContactForm() {
           <div className="absolute inset-0 bg-gradient-to-r from-transparent to-light-warm/10" />
         </div>
 
-        {/* Right — Form */}
+        {/* Right — Booking Form */}
         <div className="bg-light-warm flex items-center py-16 px-6 sm:px-12 lg:px-16">
           <div className="w-full max-w-lg">
-            <h2 className="text-3xl sm:text-4xl font-black text-navy italic leading-tight mb-4">
-              Ready to Transform Your Home?
-            </h2>
+            <div className="flex items-center gap-3 mb-4">
+              <CalendarIcon className="w-8 h-8 text-primary" />
+              <h2 className="text-3xl sm:text-4xl font-black text-navy italic leading-tight">
+                Book Your Evaluation
+              </h2>
+            </div>
             <p className="text-gray mb-8">
-              Let&apos;s work together to reduce your energy costs and increase the
-              value of your home.
+              Pick a date and time that works for you. We&apos;ll confirm your
+              appointment right away.
             </p>
 
-            {submitted && (
+            {status === "success" && (
               <div className="mb-6 p-4 bg-green-100 text-green-800 rounded-lg text-center font-medium">
-                Thank you! We&apos;ll be in touch soon.
+                Appointment booked! We&apos;ll see you then.
+              </div>
+            )}
+
+            {status === "error" && (
+              <div className="mb-6 p-4 bg-red-100 text-red-800 rounded-lg text-center font-medium">
+                {errorMsg}
               </div>
             )}
 
@@ -668,17 +749,16 @@ function ContactForm() {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-5 py-4 bg-navy text-white placeholder-white/50 rounded-lg border-none outline-none focus:ring-2 focus:ring-primary transition-all"
+                className={inputClass}
               />
               <input
                 type="text"
                 placeholder="Your Address"
-                required
                 value={formData.address}
                 onChange={(e) =>
                   setFormData({ ...formData, address: e.target.value })
                 }
-                className="w-full px-5 py-4 bg-navy text-white placeholder-white/50 rounded-lg border-none outline-none focus:ring-2 focus:ring-primary transition-all"
+                className={inputClass}
               />
               <input
                 type="tel"
@@ -688,13 +768,46 @@ function ContactForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
                 }
-                className="w-full px-5 py-4 bg-navy text-white placeholder-white/50 rounded-lg border-none outline-none focus:ring-2 focus:ring-primary transition-all"
+                className={inputClass}
               />
+
+              {/* Date & Time row */}
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  type="date"
+                  required
+                  min={getMinDate()}
+                  value={formData.date}
+                  onChange={(e) =>
+                    setFormData({ ...formData, date: e.target.value })
+                  }
+                  className={`${inputClass} ${!formData.date ? "text-white/50" : ""}`}
+                />
+                <select
+                  required
+                  value={formData.time}
+                  onChange={(e) =>
+                    setFormData({ ...formData, time: e.target.value })
+                  }
+                  className={`${inputClass} ${!formData.time ? "text-white/50" : ""}`}
+                >
+                  <option value="" disabled>
+                    Select Time
+                  </option>
+                  {timeSlots.map((slot) => (
+                    <option key={slot} value={slot} className="text-dark bg-white">
+                      {formatTimeLabel(slot)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <button
                 type="submit"
-                className="w-full py-4 bg-primary hover:bg-primary-dark text-white font-black text-sm tracking-widest uppercase rounded-lg transition-all duration-300 shadow-lg shadow-primary/30 hover:shadow-primary/50 transform hover:scale-[1.02] active:scale-[0.98]"
+                disabled={status === "loading"}
+                className="w-full py-4 bg-primary hover:bg-primary-dark text-white font-black text-sm tracking-widest uppercase rounded-lg transition-all duration-300 shadow-lg shadow-primary/30 hover:shadow-primary/50 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                SCHEDULE EVALUATION
+                {status === "loading" ? "BOOKING..." : "BOOK EVALUATION"}
               </button>
             </form>
           </div>
@@ -771,6 +884,11 @@ function Footer() {
               />
             </svg>
           </a>
+        </div>
+
+        {/* Address */}
+        <div className="mt-6 text-center text-white/40 text-xs">
+          6920 E Chelsea St, Tampa, FL 33610
         </div>
       </div>
     </footer>
