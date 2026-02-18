@@ -8,9 +8,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Protek | Revolutionizing Your Home's Energy Efficiency",
+  title: "FIE | Revolutionizing Your Home's Energy Efficiency",
   description:
-    "Protek helps you enhance your home's energy efficiency and reduce your electric bill. Schedule your free energy evaluation today.",
+    "FIE helps you enhance your home's energy efficiency and reduce your electric bill. Schedule your free energy evaluation today.",
 };
 
 export default function RootLayout({

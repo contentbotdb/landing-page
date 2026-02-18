@@ -145,7 +145,7 @@ function Navbar() {
               <ShieldIcon className="w-5 h-5 text-white" />
             </div>
             <span className="text-2xl font-black text-white tracking-tight">
-              Pro<span className="text-primary">tek</span>
+              FIE
             </span>
           </a>
 
@@ -275,7 +275,7 @@ function Hero() {
       {/* Bottom left badge */}
       <div className="absolute bottom-8 left-8 bg-white rounded-lg p-3 shadow-xl hidden sm:block">
         <div className="flex items-center gap-2">
-          <div className="text-primary font-black text-lg">Protek</div>
+          <div className="text-primary font-black text-lg">FIE</div>
           <div className="text-[10px] leading-tight text-dark">
             <div className="font-bold">ENERGY</div>
             <div className="text-primary font-black">CERTIFIED</div>
@@ -336,7 +336,7 @@ function About() {
           {/* Left — About text */}
           <div className="pt-8">
             <h2 className="text-2xl sm:text-3xl font-black text-navy leading-tight mb-6">
-              At Protek, we&apos;re dedicated to helping you enhance your home&apos;s energy
+              At FIE, we&apos;re dedicated to helping you enhance your home&apos;s energy
               efficiency and reduce your electric bill.
             </h2>
             <p className="text-gray leading-relaxed mb-8">
@@ -390,7 +390,7 @@ function About() {
 }
 
 /* =============================================
-   Why Choose Protek — Orange background section
+   Why Choose FIE — Orange background section
    ============================================= */
 function WhyChoose() {
   return (
@@ -415,7 +415,7 @@ function WhyChoose() {
           {/* Right — Content */}
           <div>
             <h2 className="text-3xl sm:text-4xl font-black text-navy italic leading-tight mb-6">
-              Why Choose Protek Energy Services?
+              Why Choose FIE Energy Services?
             </h2>
             <div className="space-y-4 text-navy/80">
               <p>
@@ -728,7 +728,7 @@ function Footer() {
               <ShieldIcon className="w-6 h-6 text-white" />
             </div>
             <div className="text-white text-xs leading-tight">
-              <div className="font-bold tracking-wider">PROTEK</div>
+              <div className="font-bold tracking-wider">FIE</div>
               <div className="text-white/50 text-[10px]">FOR A BRIGHTER TOMORROW</div>
             </div>
           </a>
