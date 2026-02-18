@@ -586,7 +586,7 @@ function Testimonials() {
             <StarburstBadge text="" className="w-12 h-12" />
             <span className="text-4xl font-black text-white">4.9</span>
             <span className="text-white/60 text-sm">
-              Out of <span className="text-primary font-bold">300</span> Reviews
+              Out of <span className="text-primary font-bold">1,000+</span> Reviews
             </span>
           </div>
           <div className="mt-6 sm:mt-0 text-right">
@@ -771,6 +771,11 @@ function Footer() {
               />
             </svg>
           </a>
+        </div>
+
+        {/* Address */}
+        <div className="mt-6 text-center text-white/40 text-xs">
+          6920 E Chelsea St, Tampa, FL 33610
         </div>
       </div>
     </footer>
