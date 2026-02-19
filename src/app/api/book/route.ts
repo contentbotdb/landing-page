@@ -40,9 +40,9 @@ export async function POST(req: NextRequest) {
 
     // Build start and end times (1-hour appointment)
     const startDateTime = `${date}T${time}:00`;
-    const endDate = new Date(`${startDateTime}`);
-    endDate.setHours(endDate.getHours() + 1);
-    const endDateTime = endDate.toISOString();
+    const [hours, minutes] = time.split(":").map(Number);
+    const endHours = String(hours + 1).padStart(2, "0");
+    const endDateTime = `${date}T${endHours}:${String(minutes).padStart(2, "0")}:00`;
 
     const event = {
       summary: `FIE Energy Evaluation — ${name}`,
