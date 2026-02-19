@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 /* =============================================
    SVG Icons
@@ -130,9 +130,6 @@ function Navbar() {
     { label: "HOME", href: "#home" },
     { label: "ABOUT US", href: "#about" },
     { label: "HOW IT WORKS", href: "#how-it-works" },
-    { label: "PARTNERS", href: "#why-choose" },
-    { label: "FAQS", href: "#faq" },
-    { label: "CAREERS", href: "#careers" },
   ];
 
   return (
@@ -614,7 +611,7 @@ function Testimonials() {
    ============================================= */
 function getTimeSlots() {
   const slots: string[] = [];
-  for (let h = 8; h <= 17; h++) {
+  for (let h = 8; h <= 20; h++) {
     const hour = h > 12 ? h - 12 : h;
     const ampm = h >= 12 ? "PM" : "AM";
     const value = `${h.toString().padStart(2, "0")}:00`;
@@ -632,10 +629,24 @@ function formatTimeLabel(value: string) {
   return `${hour}:00 ${ampm}`;
 }
 
+function getNowEST() {
+  return new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
+}
+
 function getMinDate() {
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
-  return d.toISOString().split("T")[0];
+  const d = getNowEST();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function getAvailableSlots(allSlots: string[], selectedDate: string) {
+  const now = getNowEST();
+  const todayStr = getMinDate();
+  if (selectedDate !== todayStr) return allSlots;
+  const currentHour = now.getHours();
+  return allSlots.filter((slot) => {
+    const slotHour = parseInt(slot.split(":")[0]);
+    return slotHour > currentHour;
+  });
 }
 
 /* =============================================
@@ -665,8 +676,24 @@ function ContactForm() {
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
 
   const timeSlots = getTimeSlots();
+
+  const fetchBookedSlots = useCallback(async (date: string) => {
+    if (!date) { setBookedSlots([]); return; }
+    try {
+      const res = await fetch(`/api/book?date=${date}`);
+      const data = await res.json();
+      setBookedSlots(data.bookedSlots || []);
+    } catch {
+      setBookedSlots([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchBookedSlots(formData.date);
+  }, [formData.date, fetchBookedSlots]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -779,7 +806,7 @@ function ContactForm() {
                   min={getMinDate()}
                   value={formData.date}
                   onChange={(e) =>
-                    setFormData({ ...formData, date: e.target.value })
+                    setFormData({ ...formData, date: e.target.value, time: "" })
                   }
                   className={`${inputClass} ${!formData.date ? "text-white/50" : ""}`}
                 />
@@ -794,7 +821,9 @@ function ContactForm() {
                   <option value="" disabled>
                     Select Time
                   </option>
-                  {timeSlots.map((slot) => (
+                  {getAvailableSlots(timeSlots, formData.date)
+                    .filter((slot) => !bookedSlots.includes(slot))
+                    .map((slot) => (
                     <option key={slot} value={slot} className="text-dark bg-white">
                       {formatTimeLabel(slot)}
                     </option>
@@ -825,9 +854,6 @@ function Footer() {
     { label: "HOME", href: "#home" },
     { label: "ABOUT US", href: "#about" },
     { label: "HOW IT WORKS", href: "#how-it-works" },
-    { label: "PARTNERS", href: "#why-choose" },
-    { label: "FAQS", href: "#faq" },
-    { label: "CAREERS", href: "#careers" },
     { label: "PRIVACY POLICY", href: "#" },
   ];
 
