@@ -73,10 +73,24 @@ export async function POST(req: NextRequest) {
       eventId: created.data.id,
       message: "Appointment booked successfully!",
     });
-  } catch (error) {
-    console.error("Booking error:", error);
+  } catch (error: unknown) {
+    const err = error as { message?: string; code?: number; status?: number; errors?: unknown[] };
+    console.error("Booking error:", JSON.stringify({
+      message: err.message,
+      code: err.code,
+      status: err.status,
+      errors: err.errors,
+    }));
     return NextResponse.json(
-      { error: "Failed to create booking. Please try again." },
+      {
+        error: "Failed to create booking. Please try again.",
+        debug: {
+          message: err.message,
+          code: err.code,
+          status: err.status,
+          errors: err.errors,
+        },
+      },
       { status: 500 }
     );
   }
