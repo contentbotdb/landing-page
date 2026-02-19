@@ -12,9 +12,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const credentials = JSON.parse(
-      process.env.GOOGLE_SERVICE_ACCOUNT_KEY || "{}"
-    );
+    const raw = process.env.GOOGLE_SERVICE_ACCOUNT_KEY || "{}";
+    const credentials = JSON.parse(raw);
+
+    // Fix private key: Vercel may convert literal \n to actual newlines in the
+    // JSON value, which breaks the PEM format. Ensure real newlines are present.
+    if (credentials.private_key) {
+      credentials.private_key = credentials.private_key.replace(/\\n/g, "\n");
+    }
 
     const calendarId = process.env.GOOGLE_CALENDAR_ID;
 
